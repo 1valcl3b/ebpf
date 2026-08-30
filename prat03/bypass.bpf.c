@@ -84,7 +84,7 @@ int ebpf_xdp(struct xdp_md *ctx)
 
     // ----- MODIFICAÇÕES -----
 
-    // 1. Altera MAC destino para o MAC do container upf (7a:51:73:1b:7f:32)
+    // 1. Altera MAC destino para o MAC do container upf (d6:2b:29:2d:b0:a4)
     unsigned char new_dst_mac[6] = {0xd6, 0x2b, 0x29, 0x2d, 0xb0, 0xa4};
     __builtin_memcpy(eth->h_dest, new_dst_mac, 6);
 

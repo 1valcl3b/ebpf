@@ -1,0 +1,36 @@
+criar um ambiente simples com duas VMs, sendo uma responsável por transmitir um vídeo utilizando o codec H.264 e a outra por receber 
+e reproduzir esse vídeo. Durante a transmissão, vou realizar uma captura do tráfego para análise no Wireshark. 
+O objetivo é observar a estrutura dos pacotes, identificando os cabeçalhos das diferentes camadas e, 
+principalmente, onde estão as informações relacionadas ao H.264 e às NAL Units.
+
+
+A NAL (Network Abstraction Layer) é a camada do H.264 responsável por organizar os dados codificados do vídeo em unidades chamadas NAL Units. Uma NAL Unit contém uma parte dos dados codificados do vídeo e possui um cabeçalho que indica seu tipo. Quando uma NAL Unit é grande demais para ser transportada em um único pacote, ela pode ser fragmentada em partes menores, que são transportadas por vários pacotes. No caso do H.264 sobre RTP, essa fragmentação pode ser feita utilizando FU-A.
+
+NAL = Network Abstraction Layer, a camada do H.264 que organiza o conteúdo codificado em NAL Units.
+NAL Unit = uma unidade de dados produzida/organizada nessa camada.
+
+
+
+FU: Fragmentation Unit (Unidade de Fragmentação), no contexto do H.264 sobre RTP, uma FU é usada quando uma NAL Unit é grande demais para caber em um único pacote RTP
+
+
+H.264
+    FU identifier
+        0... .... = F bit: No bit errors or other syntax violations
+        .10. .... = Nal_ref_idc (NRI): 2
+        ...1 1100 = Type: Fragmentation unit A (FU-A) (28) <---- Isso significa que o H.264 utilizou o mecanismo FU-A para dividir uma NAL Unit em vários pacotes RTP.
+
+
+O encapsulamento começa no quadro Ethernet. O cabeçalho Ethernet possui, entre outros campos, o campo Type, que indica qual protocolo está sendo transportado. Nesse caso, o valor 0x0800 indica que o conteúdo seguinte é um pacote IPv4.
+
+Em seguida, temos o cabeçalho IPv4, que contém informações como os endereços IP de origem e destino. No campo Protocol, o valor 17 indica que o protocolo da camada seguinte é o UDP.
+
+Depois vem o cabeçalho UDP, que possui as portas de origem e destino. No experimento, a porta de destino é 5004, utilizada para transportar o fluxo de vídeo.
+
+Após o UDP, temos o cabeçalho RTP, responsável pelo transporte do fluxo de mídia. Entre seus campos estão o Payload Type, que no experimento possui o valor 96 e foi associado ao H.264, além do Sequence Number e do Timestamp, utilizados para identificar e ordenar os pacotes do fluxo.
+
+Depois do cabeçalho RTP está o RTP Payload, onde são transportados os dados do H.264. Como as NAL Units podem ser grandes demais para caber em um único pacote RTP, elas podem ser fragmentadas utilizando FU-A (Fragmentation Unit A).
+
+Quando é utilizado FU-A, o payload contém o FU Indicator e o FU Header. O FU Header possui, entre outros campos, os bits Start e End, que indicam se aquele pacote é o primeiro ou o último fragmento da NAL, e o NAL Type, que identifica o tipo da NAL original. Por exemplo, no experimento, NAL Type = 5 indica uma NAL IDR, enquanto NAL Type = 1 indica uma NAL non-IDR.
+
+Por fim, após esses campos de controle, está o NAL Unit Payload, que contém os dados codificados do vídeo. Quando a NAL foi fragmentada, esses dados são distribuídos entre vários pacotes RTP e posteriormente podem ser reconstruídos pelo receptor.
