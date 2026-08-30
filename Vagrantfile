@@ -47,15 +47,12 @@ Vagrant.configure("2") do |config|
     client.vm.provision "shell", inline: <<-SHELL
       apt update
       apt install -y \
-      git \
+      git build-essential clang llvm python3 python3-pip python3-bpfcc bpfcc-tools libbpfcc-dev linux-headers-$(uname -r) iproute2 tcpdump \
       iproute2 \
       iperf3 \
       hping3 \
-      tcpdump \
       net-tools \
       curl \
-      python3 \
-      python3-pip \
       vim \
       ffmpeg \
       xauth

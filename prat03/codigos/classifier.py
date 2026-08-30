@@ -2,10 +2,10 @@
 
 from bcc import BPF
 import time
-import argparse
 import sys
 
-program = BPF(src_file="bypass.bpf.c")
+
+IFACE = "eth1"
 
 def anexar_xdp(bpf, fn, iface):
     try:
@@ -21,17 +21,12 @@ def remover_xdp(bpf, iface):
         pass
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("iface", help="Interface de entrada (ex: enp1s0)")
-    args = parser.parse_args()
-    iface = args.iface
-
     try:
-        b = BPF(text=program)
+        b = BPF(src_file="classificador.bpf.c")
         fn = b.load_func("ebpf_xdp", BPF.XDP)
-        anexar_xdp(b, fn, iface)
+        anexar_xdp(b, fn, IFACE)
 
-        print(f"XDP carregado na interface {iface}")
+        print(f"XDP carregado na interface {IFACE}")
         print("Pressione CTRL+C para sair")
 
         while True:
@@ -39,8 +34,5 @@ if __name__ == "__main__":
 
     except KeyboardInterrupt:
         print("\nRemovendo XDP...")
-        remover_xdp(b, iface)
+        remover_xdp(b, IFACE)
         sys.exit(0)
-
-
-
