@@ -34,3 +34,12 @@ Depois do cabeçalho RTP está o RTP Payload, onde são transportados os dados d
 Quando é utilizado FU-A, o payload contém o FU Indicator e o FU Header. O FU Header possui, entre outros campos, os bits Start e End, que indicam se aquele pacote é o primeiro ou o último fragmento da NAL, e o NAL Type, que identifica o tipo da NAL original. Por exemplo, no experimento, NAL Type = 5 indica uma NAL IDR, enquanto NAL Type = 1 indica uma NAL non-IDR.
 
 Por fim, após esses campos de controle, está o NAL Unit Payload, que contém os dados codificados do vídeo. Quando a NAL foi fragmentada, esses dados são distribuídos entre vários pacotes RTP e posteriormente podem ser reconstruídos pelo receptor.
+
+
+
+- Experimento com Hash Table
+
+Quantos pacotes de rede estão associados a conteúdo IDR e Non-IDR? para responder essa pergunta não devo usar Start e End para decidir a contagem
+
+agora se eu quiser mudar a métrica para quantidade de NAL units, devo considerar os campos start e end
+
