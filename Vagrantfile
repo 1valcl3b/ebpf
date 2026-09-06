@@ -11,13 +11,15 @@ Vagrant.configure("2") do |config|
     server.vm.box = "generic/ubuntu2204"
     server.vm.hostname = "server"
 
-    server.vm.synced_folder "./logs", "/home/vagrant/logs"
+    server.vm.synced_folder "./prat03/codigos", "/home/vagrant/codigos"
+    server.vm.synced_folder "./prat03/videos", "/home/vagrant/videos"
 
-    server.vm.network "private_network", ip: "10.0.0.1", libvirt__network_name: "net-kvm"
+    server.vm.network "private_network", ip: "10.0.0.10", libvirt__network_name: "net-kvm"
 
     server.vm.provider :libvirt do |lv|
       lv.memory = 2048
       lv.cpus = 2
+      # lv.management_network_ip = "192.168.121.10"
     end
 
     server.vm.provision "shell", inline: <<-SHELL
@@ -35,13 +37,14 @@ Vagrant.configure("2") do |config|
     client.vm.box = "generic/ubuntu2204"
     client.vm.hostname = "client"
 
-    client.vm.synced_folder "./logs", "/home/vagrant/logs"
+    client.vm.synced_folder "./prat03/codigos", "/home/vagrant/codigos"
 
     client.vm.network "private_network", ip: "10.0.0.2", libvirt__network_name: "net-kvm"
 
     client.vm.provider :libvirt do |lv|
       lv.memory = 2048
       lv.cpus = 2
+      # lv.management_network_ip = "192.168.121.11"
     end
 
     client.vm.provision "shell", inline: <<-SHELL
