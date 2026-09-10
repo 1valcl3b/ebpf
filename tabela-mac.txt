@@ -1,0 +1,12 @@
+sudo simple_switch_CLI
+
+table_add MyIngress.mac_forward MyIngress.forward 08:00:27:60:0c:50 => 1
+
+table_add MyIngress.mac_forward MyIngress.forward 08:00:27:1d:e0:27 => 2
+
+table_add MyIngress.mac_forward MyIngress.flood ff:ff:ff:ff:ff:ff =>
+
+
+Mostrar tabela 
+
+table_dump MyIngress.mac_forward

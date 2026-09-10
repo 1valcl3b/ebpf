@@ -1,0 +1,5 @@
+<network>
+  <name>net-client-p4</name>
+  <forward mode="none"/>
+  <bridge name="virbr-p4-client" />
+</network>

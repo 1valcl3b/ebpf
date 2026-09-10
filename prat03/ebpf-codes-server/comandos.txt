@@ -1,6 +1,6 @@
 gerar tráfego com ffmpeg:
 
-ffmpeg -re -i video.mp4 -an -c:v copy -f rtp rtp://10.0.0.2:5004
+ffmpeg -re -i videos/video.mp4 -an -c:v copy -f rtp rtp://10.0.0.2:5004
 
 verficar trace do kernel:
 

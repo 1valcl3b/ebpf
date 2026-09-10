@@ -43,3 +43,8 @@ Quantos pacotes de rede estão associados a conteúdo IDR e Non-IDR? para respon
 
 agora se eu quiser mudar a métrica para quantidade de NAL units, devo considerar os campos start e end
 
+
+----- 08/09/2026 -----
+
+
+a cada 10 pacotes perde 1, com pacotes i
