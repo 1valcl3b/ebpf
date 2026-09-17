@@ -3,9 +3,15 @@
 from bcc import BPF
 import time
 import sys
-
+import csv
+import os
 
 INTERFACE = "eth1"
+
+TYPE_IDR = 0
+TYPE_NON_IDR = 1
+
+TIMEOUT_INATIVIDADE = 5.0
 
 
 def anexar_xdp(bpf, fn, interface):
@@ -23,64 +29,101 @@ def remover_xdp(bpf, interface):
         pass
 
 
-def mostrar_contadores(bpf):
-
+def ler_contadores(bpf):
     tabela = bpf.get_table("packet_count")
-
     idr = 0
     non_idr = 0
 
     for key, value in tabela.items():
-
-        if key.value == 0:
+        if key.value == TYPE_IDR:
             idr = value.value
-
-        elif key.value == 1:
+        elif key.value == TYPE_NON_IDR:
             non_idr = value.value
 
-    print("\n==============================")
-    print("      CONTADORES H.264")
-    print("==============================")
+    return idr, non_idr
 
-    print(f"Pacotes IDR     : {idr}")
-    print(f"Pacotes Non-IDR : {non_idr}")
 
+def registrar_e_zerar(bpf, repeticao, idr, non_idr, arq_csv="rodadas.csv"):
+    arq_existe = os.path.exists(arq_csv)
+
+    with open(arq_csv, mode="a", newline="", encoding="utf-8") as f:
+        e = csv.writer(f)
+
+        if not arq_existe:
+            e.writerow(["Repeticao", "Pacotes I", "Pacotes Non-I"])
+
+        e.writerow([repeticao, idr, non_idr])
+
+    print(f"\n\n============================== [FIM DA RODADA {repeticao}]")
+    print(f" Pacotes IDR gravados     : {idr}")
+    print(f" Pacotes Non-IDR gravados : {non_idr}")
+    print(" Resetando contadores no eBPF e aguardando próximo envio...")
     print("==============================\n")
 
 
+    tabela = bpf.get_table("packet_count")
+    tabela.clear()
+
+
 if __name__ == "__main__":
+    repeticao = 1
 
     try:
-
-        
         b = BPF(src_file="classificador.bpf.c")
+        fn = b.load_func("ebpf_xdp", BPF.XDP)
 
-
-        fn = b.load_func("ebpf_xdp",BPF.XDP)
-
-
-        # Anexa XDP
-        anexar_xdp(b,fn,INTERFACE)
-
+        anexar_xdp(b, fn, INTERFACE)
 
         print(f"XDP carregado na interface {INTERFACE}")
+        print("Aguardando tráfego de pacotes...\n")
 
-        print("Pressione CTRL+C para sair")
-
+        ultimo_total_pacotes = 0
+        ultima_atividade = time.time()
+        em_transmissao = False
 
         while True:
+            idr, non_idr = ler_contadores(b)
+            total_pacotes = idr + non_idr
+            agora = time.time()
 
-            mostrar_contadores(b)
+            
+            if total_pacotes > ultimo_total_pacotes:
+                ultimo_total_pacotes = total_pacotes
+                ultima_atividade = agora
+                em_transmissao = True
 
-            time.sleep(1)
+            tempo_sem_pacotes = agora - ultima_atividade
 
+            
+            if em_transmissao:
+                print(
+                    f"\r[Rodada {repeticao}] Em progresso... IDR: {idr} | Non-IDR: {non_idr} | Inativo há: {tempo_sem_pacotes:.1f}s",
+                    end="",
+                )
+            else:
+                print(
+                    f"\r[Aguardando Rodada {repeticao}] Esperando o FFmpeg iniciar o envio...",
+                    end="",
+                )
+
+            
+            if em_transmissao and tempo_sem_pacotes >= TIMEOUT_INATIVIDADE:
+                registrar_e_zerar(b, repeticao, idr, non_idr)
+
+                
+                repeticao += 1
+                ultimo_total_pacotes = 0
+                em_transmissao = False
+
+            time.sleep(0.5)
 
     except KeyboardInterrupt:
-
-        print("\nRemovendo XDP...")
-
-        mostrar_contadores(b)
-
-        remover_xdp(b,INTERFACE)
-
+        print("\n\nEncerrando e removendo XDP...")
+        remover_xdp(b, INTERFACE)
         sys.exit(0)
+
+    except Exception as e:
+        print("\nErro:")
+        print(e)
+        remover_xdp(b, INTERFACE)
+        sys.exit(1)

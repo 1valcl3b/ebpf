@@ -15,23 +15,11 @@
 #define TYPE_NON_IDR 1
 
 
-// =========================================================
-// HASH TABLE
-//
-// Key:
-// 0 = IDR
-// 1 = Non-IDR
-//
-// Value:
-// quantidade de pacotes enviados
-// =========================================================
+
 
 BPF_HASH(packet_count, __u32, __u64);
 
 
-// =========================================================
-// FUNÇÃO PARA INCREMENTAR CONTADOR
-// =========================================================
 
 static __always_inline void incrementar_contador(__u32 key)
 {
@@ -58,17 +46,12 @@ static __always_inline void incrementar_contador(__u32 key)
 
 int ebpf_tc(struct __sk_buff *skb)
 {
-    // =========================================================
-    // LIMITES DO PACOTE
-    // =========================================================
+
 
     void *data = (void *)(long)skb->data;
     void *data_end = (void *)(long)skb->data_end;
 
 
-    // =========================================================
-    // ETHERNET
-    // =========================================================
 
     struct ethhdr *eth = data;
 
@@ -81,9 +64,6 @@ int ebpf_tc(struct __sk_buff *skb)
         return TC_ACT_OK;
 
 
-    // =========================================================
-    // IPv4
-    // =========================================================
 
     struct iphdr *ip = (struct iphdr *)(eth + 1);
 
@@ -172,9 +152,7 @@ int ebpf_tc(struct __sk_buff *skb)
         payload[0] & 0x1F;
 
 
-    // =========================================================
-    // NAL NÃO FRAGMENTADA
-    // =========================================================
+
 
     if (nal_type == 5)
     {
@@ -187,10 +165,7 @@ int ebpf_tc(struct __sk_buff *skb)
     }
 
 
-    // =========================================================
-    // FU-A
-    // =========================================================
-
+ 
     else if (nal_type == 28)
     {
         /*

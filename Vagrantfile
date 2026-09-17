@@ -57,12 +57,12 @@ Vagrant.configure("2") do |config|
     swbmv2.vm.network "private_network", libvirt__network_name: "net-client-p4", auto_config: false
 
     swbmv2.vm.provider :libvirt do |lv|
-      lv.memory = 4096
-      lv.cpus = 4
+      lv.memory = 2048
+      lv.cpus = 4   
       # lv.management_network_ip = "192.168.121.11"
     end
 
-    swbmv2.vm.provision "shell", path: "provision/swbmv2.sh"
+    # swbmv2.vm.provision "shell", path: "provision/swbmv2.sh"
   end
   
 end

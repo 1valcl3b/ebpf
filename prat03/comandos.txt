@@ -1,0 +1,24 @@
+gerar tráfego com ffmpeg:
+
+ffmpeg -re -i videos/video.mp4 -an -c:v copy -f rtp rtp://10.0.0.2:5004
+
+verficar trace do kernel:
+
+sudo cat /sys/kernel/debug/tracing/trace_pipe
+
+======================================================
+
+
+Aplicar delay: sudo tc qdisc add dev eth1 root tbf rate 100mbit burst 16kbit latency 400ms
+               sudo tc qdisc add dev eth1 root tbf rate 100mbit burst 16kbit latency 400ms
+
+retirar: sudo tc qdisc del dev eth1 root
+
+verficar: tc -s qdisc show dev eth1
+
+
+=======================================================
+
+compilar codigo p4:
+
+p4c --target bmv2 --arch v1model sw-count.p4

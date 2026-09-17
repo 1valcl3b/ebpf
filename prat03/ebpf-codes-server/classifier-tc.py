@@ -5,6 +5,8 @@ from pyroute2 import IPRoute
 
 import time
 import sys
+import csv
+import os
 
 
 INTERFACE = "eth1"
@@ -13,22 +15,21 @@ TYPE_IDR = 0
 TYPE_NON_IDR = 1
 
 
-def mostrar_contadores(bpf):
+
+
+def contadores(bpf):
 
     tabela = bpf.get_table("packet_count")
 
     idr = 0
-    non_idr = 0
-
+    non_idr = 0 
 
     for key, value in tabela.items():
 
-        if key.value == TYPE_IDR:
-            idr = value.value
-
+        if   key.value == TYPE_IDR:
+            idr = value.value   
         elif key.value == TYPE_NON_IDR:
             non_idr = value.value
-
 
     print("\n==============================")
     print(" PACOTES H.264 ENVIADOS")
@@ -46,87 +47,36 @@ if __name__ == "__main__":
 
     try:
 
-        # =====================================================
-        # CARREGA O PROGRAMA eBPF
-        # =====================================================
-
-        b = BPF(
-            src_file="classificador-tc.bpf.c"
-        )
+        b = BPF(src_file="classificador-tc.bpf.c")
 
 
-        # =====================================================
-        # CARREGA A FUNÇÃO COMO TC
-        # =====================================================
-
-        fn = b.load_func(
-            "ebpf_tc",
-            BPF.SCHED_CLS
-        )
-
-
-        # =====================================================
-        # ACESSA A INTERFACE
-        # =====================================================
+        fn = b.load_func("ebpf_tc",BPF.SCHED_CLS)
 
         ip = IPRoute()
 
-        interface_index = ip.link_lookup(
-            ifname=INTERFACE
-        )[0]
-
-
-        # =====================================================
-        # CRIA CLSACT
-        # =====================================================
+        interface_index = ip.link_lookup(ifname=INTERFACE)[0]
 
         try:
 
-            ip.tc(
-                "add",
-                "clsact",
-                interface_index
-            )
+            ip.tc("add","clsact",interface_index)
 
         except Exception:
 
-            # Pode já existir
+
             pass
 
 
-        # =====================================================
-        # ANEXA eBPF NO EGRESS
-        # =====================================================
 
-        ip.tc(
-            "add-filter",
-            "bpf",
-            interface_index,
-            ":1",
-            fd=fn.fd,
-            name="ebpf_tc",
-            parent="ffff:fff3",
-            classid=1,
-            direct_action=True
-        )
+        ip.tc("add-filter","bpf",interface_index,":1",fd=fn.fd,name="ebpf_tc",parent="ffff:fff3",classid=1,direct_action=True)
 
 
-        print(
-            f"TC eBPF carregado na interface {INTERFACE}"
-        )
-
-        print("Direção: EGRESS")
-
-        print("Pressione CTRL+C para sair")
+        print(f"TC eBPF carregado na interface {INTERFACE}")
 
 
-        # =====================================================
-        # LOOP
-        # =====================================================
 
         while True:
 
-            mostrar_contadores(b)
+            contadores(b)
 
             time.sleep(1)
 
@@ -138,7 +88,7 @@ if __name__ == "__main__":
 
         if 'b' in locals():
 
-            mostrar_contadores(b)
+            contadores(b)
 
 
     except Exception as e:
@@ -149,19 +99,12 @@ if __name__ == "__main__":
 
     finally:
 
-        # =====================================================
-        # REMOVE CLSACT
-        # =====================================================
 
         if ip:
 
             try:
 
-                ip.tc(
-                    "del",
-                    "clsact",
-                    interface_index
-                )
+                ip.tc("del","clsact",interface_index)
 
             except Exception:
 
