@@ -6,6 +6,16 @@ verficar trace do kernel:
 
 sudo cat /sys/kernel/debug/tracing/trace_pipe
 
+
+
+tcpdump: sudo tcpdump -i eth2 -nn 'dst host 10.0.0.2 and dst port 5004'
+
+
+
+
+
+
+
 ======================================================
 
 
