@@ -69,7 +69,7 @@ if __name__ == "__main__":
     repeticao = 1
 
     try:
-        b = BPF(src_file="classificador.bpf.c")
+        b = BPF(src_file="c.bpf.c")
         fn = b.load_func("ebpf_xdp", BPF.XDP)
 
         anexar_xdp(b, fn, INTERFACE)

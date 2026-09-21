@@ -48,37 +48,18 @@ def ler_contadores(bpf):
     return idr, non_idr
 
 
-def registrar_e_zerar(
-    bpf,
-    repeticao,
-    idr,
-    non_idr,
-    arq_csv="rodadas.csv"
-):
+def registrar_e_zerar(bpf,repeticao,idr,non_idr,arq_csv="rodadas.csv"):
 
     arq_existe = os.path.exists(arq_csv)
 
-    with open(
-        arq_csv,
-        mode="a",
-        newline="",
-        encoding="utf-8"
-    ) as f:
+    with open(arq_csv,mode="a",newline="",encoding="utf-8") as f:
 
         e = csv.writer(f)
 
         if not arq_existe:
-            e.writerow([
-                "Repeticao",
-                "Pacotes I",
-                "Pacotes Non-I"
-            ])
+            e.writerow(["Repeticao","Pacotes I","Pacotes Non-I"])
 
-        e.writerow([
-            repeticao,
-            idr,
-            non_idr
-        ])
+        e.writerow([repeticao,idr,non_idr])
 
 
     print(
@@ -86,18 +67,11 @@ def registrar_e_zerar(
         f"[FIM DA RODADA {repeticao}]"
     )
 
-    print(
-        f" Pacotes IDR gravados     : {idr}"
-    )
+    print(f" Quantidade pacotes IDR: {idr}")
 
-    print(
-        f" Pacotes Non-IDR gravados : {non_idr}"
-    )
+    print(f" Quantidade pacotes Non-IDR: {non_idr}")
 
-    print(
-        " Resetando contadores no eBPF "
-        "e aguardando próximo envio..."
-    )
+    print(" Resetando contadores no eBPF " "e aguardando próximo envio...")
 
     print("==============================\n")
 
@@ -113,28 +87,15 @@ if __name__ == "__main__":
 
     try:
 
-        b = BPF(
-            src_file="c.bpf.c"
-        )
+        b = BPF(src_file="c.bpf.c")
 
-        fn = b.load_func(
-            "ebpf_xdp",
-            BPF.XDP
-        )
+        fn = b.load_func("ebpf_xdp",BPF.XDP)
 
-        anexar_xdp(
-            b,
-            fn,
-            INTERFACE
-        )
+        anexar_xdp(b,fn,INTERFACE)
 
-        print(
-            f"XDP carregado na interface {INTERFACE}"
-        )
+        print(f"XDP carregado na interface {INTERFACE}")
 
-        print(
-            "Aguardando tráfego de pacotes...\n"
-        )
+        print("Aguardando tráfego de pacotes...\n")
 
 
         ultimo_total_pacotes = 0
@@ -163,9 +124,7 @@ if __name__ == "__main__":
                 em_transmissao = True
 
 
-            tempo_sem_pacotes = (
-                agora - ultima_atividade
-            )
+            tempo_sem_pacotes = (agora - ultima_atividade)
 
 
             # Exibe situação atual
@@ -185,7 +144,7 @@ if __name__ == "__main__":
 
                 print(
                     f"\r[Aguardando Rodada {repeticao}] "
-                    f"Esperando o FFmpeg iniciar o envio...",
+                    f"Esperando o envio do video",
                     end=""
                 )
 
@@ -196,12 +155,7 @@ if __name__ == "__main__":
                 and tempo_sem_pacotes >= TIMEOUT_INATIVIDADE
             ):
 
-                registrar_e_zerar(
-                    b,
-                    repeticao,
-                    idr,
-                    non_idr
-                )
+                registrar_e_zerar(b,repeticao,idr,non_idr)
 
                 repeticao += 1
 

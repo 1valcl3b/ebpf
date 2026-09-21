@@ -11,8 +11,8 @@ Vagrant.configure("2") do |config|
     server.vm.box = "generic/ubuntu2204"
     server.vm.hostname = "server"
 
-    server.vm.synced_folder "./prat03/ebpf-codes-server", "/home/vagrant/ebpf-codes-server"
-    server.vm.synced_folder "./prat03/videos", "/home/vagrant/videos"
+    server.vm.synced_folder "./lab-video/ebpf-codes-server", "/home/vagrant/ebpf-codes-server"
+    server.vm.synced_folder "./lab-video/videos", "/home/vagrant/videos"
 
     # server.vm.network "private_network", ip: "10.0.0.10", libvirt__network_name: "net-kvm"
 
@@ -33,7 +33,7 @@ Vagrant.configure("2") do |config|
     client.vm.box = "generic/ubuntu2204"
     client.vm.hostname = "client"
 
-    client.vm.synced_folder "./prat03/ebpf-codes-client", "/home/vagrant/ebpf-codes-client"
+    client.vm.synced_folder "./lab-video/ebpf-codes-client", "/home/vagrant/ebpf-codes-client"
 
     # client.vm.network "private_network", ip: "10.0.0.2", libvirt__network_name: "net-kvm"
 
