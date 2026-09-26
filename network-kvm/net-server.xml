@@ -1,0 +1,5 @@
+<network>
+  <name>net-server</name>
+  <forward mode="none"/>
+  <bridge name="virbr-server" />
+</network>

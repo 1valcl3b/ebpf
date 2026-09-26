@@ -16,7 +16,7 @@ Vagrant.configure("2") do |config|
 
     # server.vm.network "private_network", ip: "10.0.0.10", libvirt__network_name: "net-kvm"
 
-    server.vm.network "private_network",ip: "10.0.0.10", mac: "080027600c50" ,libvirt__network_name: "net-server-p4"
+    server.vm.network "private_network",ip: "10.0.0.10", mac: "080027600c50" ,libvirt__network_name: "net-server"
 
     server.vm.provider :libvirt do |lv|
       lv.memory = 2048
@@ -37,7 +37,7 @@ Vagrant.configure("2") do |config|
 
     # client.vm.network "private_network", ip: "10.0.0.2", libvirt__network_name: "net-kvm"
 
-    client.vm.network "private_network", ip: "10.0.0.2", mac: "0800271de027" ,libvirt__network_name: "net-client-p4"
+    client.vm.network "private_network", ip: "10.0.0.2", mac: "0800271de027" ,libvirt__network_name: "net-client"
 
     client.vm.provider :libvirt do |lv|
       lv.memory = 2048
@@ -48,21 +48,23 @@ Vagrant.configure("2") do |config|
     client.vm.provision "shell", path: "provision/client.sh"
   end
 
-  config.vm.define "sw-bmv2" do |swbmv2|
-    swbmv2.vm.box = "generic/ubuntu2204"
-    swbmv2.vm.hostname = "sw-bmv2"
+  config.vm.define "sw_vm" do |sw_vm|
+    sw_vm.vm.box = "generic/ubuntu2204"
+    sw_vm.vm.hostname = "sw-bmv2"
 
-    swbmv2.vm.network "private_network", libvirt__network_name: "net-server-p4", auto_config: false
+    sw_vm.vm.synced_folder "./lab-video/sw_vm/", "/home/vagrant/"
 
-    swbmv2.vm.network "private_network", libvirt__network_name: "net-client-p4", auto_config: false
+    sw_vm.vm.network "private_network", libvirt__network_name: "net-server", auto_config: false
 
-    swbmv2.vm.provider :libvirt do |lv|
+    sw_vm.vm.network "private_network", libvirt__network_name: "net-client", auto_config: false
+
+    sw_vm.vm.provider :libvirt do |lv|
       lv.memory = 2048
       lv.cpus = 4   
       # lv.management_network_ip = "192.168.121.11"
     end
 
-    # swbmv2.vm.provision "shell", path: "provision/swbmv2.sh"
+    sw_vm.vm.provision "shell", path: "provision/sw_vm.sh"
   end
   
 end

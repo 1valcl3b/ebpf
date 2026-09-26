@@ -25,9 +25,7 @@
 BPF_HASH(packet_count, __u32, __u64);
 
 
-// =========================================================
-// FUNÇÃO PARA INCREMENTAR CONTADOR
-// =========================================================
+
 
 static __always_inline void incrementar_contador(__u32 key)
 {
@@ -57,10 +55,6 @@ static __always_inline void incrementar_contador(__u32 key)
 
 int ebpf_xdp(struct xdp_md *ctx)
 {
-    // =========================================================
-    // LIMITES DO PACOTE
-    // =========================================================
-
     void *data_end = (void *)(long)ctx->data_end;
     void *data = (void *)(long)ctx->data;
 
@@ -94,7 +88,7 @@ int ebpf_xdp(struct xdp_md *ctx)
         return XDP_PASS;
 
 
-    // Calcula tamanho do cabeçalho IP
+    
     __u32 ip_hdr_len = ip->ihl * 4;
 
     if (ip_hdr_len < sizeof(struct iphdr))
@@ -160,13 +154,11 @@ int ebpf_xdp(struct xdp_md *ctx)
     __u8 nal_type = payload[0] & 0x1F;
 
 
-    // =========================================================
-    // NAL NÃO FRAGMENTADO
-    // =========================================================
+   
 
     if (nal_type == 5)
     {
-        // IDR
+
 
         incrementar_contador(TYPE_IDR);
 
@@ -175,7 +167,7 @@ int ebpf_xdp(struct xdp_md *ctx)
 
     else if (nal_type == 1)
     {
-        // Non-IDR
+   
 
         incrementar_contador(TYPE_NON_IDR);
 
@@ -183,29 +175,17 @@ int ebpf_xdp(struct xdp_md *ctx)
     }
 
 
-    // =========================================================
-    // FU-A
-    // =========================================================
+
 
     else if (nal_type == 28)
     {
-        /*
-         * FU-A:
-         *
-         * payload[0] = FU Indicator
-         * payload[1] = FU Header
-         */
+
 
         __u8 fu_header = payload[1];
 
 
-        // Tipo NAL original
         __u8 original_nal_type = fu_header & 0x1F;
 
-
-        // -----------------------------------------------------
-        // IDR fragmentado
-        // -----------------------------------------------------
 
         if (original_nal_type == 5)
         {
@@ -213,11 +193,6 @@ int ebpf_xdp(struct xdp_md *ctx)
 
             bpf_trace_printk("pacote IDR\n");
         }
-
-
-        // -----------------------------------------------------
-        // Non-IDR fragmentado
-        // -----------------------------------------------------
 
         else if (original_nal_type == 1)
         {
