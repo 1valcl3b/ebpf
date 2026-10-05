@@ -29,6 +29,28 @@ verficar: tc -s qdisc show dev eth1
 
 =======================================================
 
+teste copiando video no client
+
+
+server: ffmpeg -re -i videos/video.mp4 -an -c:v copy -f rtp -sdp_file video.sdp rtp://10.0.0.2:5004
+
+client: ffmpeg -protocol_whitelist file,udp,rtp -i video.sdp -c:v copy video-recebido.mp4
+
+
+gerar arquivo sdp: ffmpeg -re -i videos/video.mp4 -an -c:v copy -f rtp -sdp_file video.sdp rtp://10.0.0.2:5004 -t 0
+
+Mudar o nome do arquivo de vídeo
+=======================================================
+
+
+
+=======================================================
+
 compilar codigo p4:
 
 p4c --target bmv2 --arch v1model sw-count.p4
+
+
+
+=======================================================
+

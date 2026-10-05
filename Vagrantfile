@@ -1,10 +1,13 @@
 Vagrant.configure("2") do |config|
 
-  config.ssh.forward_x11 = true
+  config.ssh.insert_key = false
+  
+  # config.ssh.forward_x11 = true
 
   config.vm.provider :libvirt do |libvirt|
     libvirt.memory = 2048
     libvirt.cpus = 2
+    # libvirt.storage_pool_name = "meu_pool"
   end
 
     config.vm.define "server" do |server|
@@ -50,7 +53,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "sw_vm" do |sw_vm|
     sw_vm.vm.box = "generic/ubuntu2204"
-    sw_vm.vm.hostname = "sw-bmv2"
+    sw_vm.vm.hostname = "sw-vm"
 
     sw_vm.vm.synced_folder "./lab-video/sw_vm/", "/home/vagrant/"
 
