@@ -48,3 +48,10 @@ agora se eu quiser mudar a métrica para quantidade de NAL units, devo considera
 
 
 a cada 10 pacotes perde 1, com pacotes i
+
+
+------------ 09/10/2026 ------------
+
+A solução proposta consiste em descartar intencionalmente aproximadamente 10% dos pacotes IDR no switch, simulando a perda de pacotes importantes em uma rede congestionada. No cliente, um programa eBPF/XDP analisa os pacotes RTP recebidos, utilizando informações como Sequence Number, Timestamp e o tipo de NAL do H.264 para detectar perdas e identificar as Access Units afetadas.
+
+Quando uma perda comprometer uma Access Unit IDR, o XDP considera a sequência de vídeo atual inválida e descarta os pacotes Non-IDR subsequentes até receber uma nova IDR válida. Dessa forma, pacotes potencialmente inúteis para a decodificação são descartados antes de chegarem à pilha de rede e à aplicação, com o objetivo de reduzir o processamento desnecessário no cliente.
