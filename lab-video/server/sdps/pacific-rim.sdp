@@ -1,0 +1,10 @@
+v=0
+o=- 0 0 IN IP4 127.0.0.1
+s=Pacific Rim - Gipsy Danger vs Otachi Fight (HDR - 4K - 5.1)
+c=IN IP4 10.0.0.2
+t=0 0
+a=tool:libavformat 58.76.100
+m=video 5004 RTP/AVP 96
+b=AS:4173
+a=rtpmap:96 H264/90000
+a=fmtp:96 packetization-mode=1; sprop-parameter-sets=Z2QAKKzRAHgCJ+XAWoCAgNuAAAH0gABdwAeMGIk=,aOvvLA==; profile-level-id=640028

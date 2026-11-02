@@ -1,0 +1,22 @@
+sudo apt install -y xauth x11-apps fonts-dejavu
+
+sudo vim /etc/ssh/sshd_config
+
+alterar para ficar assim:
+
+X11Forwarding yes
+X11DisplayOffset 10
+X11UseLocalhost no
+
+salvar e reinicar o serviço ssh
+
+sudo systemctl restart sshd
+
+
+iniciar com:
+
+vagrant ssh client -- -Y
+
+testes:
+
+echo $DISPLAY

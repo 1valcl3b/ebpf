@@ -40,17 +40,36 @@ client: ffmpeg -protocol_whitelist file,udp,rtp -i video.sdp -c:v copy video-rec
 gerar arquivo sdp: ffmpeg -re -i videos/video.mp4 -an -c:v copy -f rtp -sdp_file video.sdp rtp://10.0.0.2:5004 -t 0
 
 Mudar o nome do arquivo de vídeo
-=======================================================
 
 
+Codificando o video:
 
-=======================================================
-
-compilar codigo p4:
-
-p4c --target bmv2 --arch v1model sw-count.p4
-
+ffmpeg -protocol_whitelist file,udp,rtp -fflags +discardcorrupt -err_detect explode -i sdps/pacific-rim.sdp -c:v libx264 -preset ultrafast \
+ -crf 18 video-recebido-filtrado.mp4
 
 
 =======================================================
 
+
+abrir janela VLC
+
+vlc --demux=avformat ~/cs_video.sdp
+
+
+testar envio e recebimento com ffmpeg e ffplay
+
+
+enviar no servidor: ffmpeg -stream_loop -1 -re -i cs-1min.mp4 -an -c:v copy -f rtp -sdp_file cs_video.sdp rtp://10.0.0.2:5004
+
+receber no clinte: ffplay -protocol_whitelist file,udp,rtp ~/cs_video.sdp
+
+
+=======================================================
+
+Aumentar tamanho do buffer no client:
+
+sudo sysctl -w net.core.rmem_max=16777216
+sudo sysctl -w net.core.rmem_default=16777216
+
+ffmpeg -protocol_whitelist file,udp,rtp -buffer_size 4194304 -fflags +discardcorrupt -err_detect explode -i sdps/cs1min.sdp 
+  -c:v libx264 -crf 18 -preset ultrafast cs-comsolucao-teste.mp4
