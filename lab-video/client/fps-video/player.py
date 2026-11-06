@@ -28,45 +28,45 @@ VIDEO_FILE = args.output[1]
 SDP = args.sdp
 
 
-comando = [
-    "ffmpeg",
-    "-y",
-    "-nostats",
-    "-progress", "pipe:1",
-    "-stats_period", "1",
-    "-protocol_whitelist", "file,udp,rtp",
-    "-buffer_size", "16777216", 
-    "-max_delay", "500000", 
-    "-fflags", "+discardcorrupt+nobuffer",
-    "-i", SDP,
-    "-c:v", "copy",
-    VIDEO_FILE
-]
-
 # comando = [
 #     "ffmpeg",
 #     "-y",
 #     "-nostats",
 #     "-progress", "pipe:1",
 #     "-stats_period", "1",
-
-#     # Configurações do socket de entrada RTP/UDP
 #     "-protocol_whitelist", "file,udp,rtp",
-#     "-buffer_size", "16777216",            # 16 MB de buffer UDP
-#     "-max_delay", "500000",                # 500ms de tolerância a jitter no RTP
-#     "-fflags", "+discardcorrupt+nobuffer", # Descarta pacotes corrompidos sem acumular atraso
-#     "-flags", "+low_delay",
-
+#     "-buffer_size", "16777216", 
+#     "-max_delay", "500000", 
+#     "-fflags", "+discardcorrupt+nobuffer",
 #     "-i", SDP,
-
-#     # Configurações do Codificador H.264 via CPU
-#     "-c:v", "libx264",
-#     "-preset", "ultrafast",                # Menor consumo possível de CPU por frame
-#     "-crf", "23",                         # Fator de qualidade equilibrado
-#     "-threads", "0",                       # Distribui a decodificação/codificação por todos os núcleos da CPU
-
+#     "-c:v", "copy",
 #     VIDEO_FILE
 # ]
+
+comando = [
+    "ffmpeg",
+    "-y",
+    "-nostats",
+    "-progress", "pipe:1",
+    "-stats_period", "1",
+
+    # Configurações do socket de entrada RTP/UDP
+    "-protocol_whitelist", "file,udp,rtp",
+    "-buffer_size", "16777216",            # 16 MB de buffer UDP
+    "-max_delay", "500000",                # 500ms de tolerância a jitter no RTP
+    "-fflags", "+discardcorrupt+nobuffer", # Descarta pacotes corrompidos sem acumular atraso
+    "-flags", "+low_delay",
+
+    "-i", SDP,
+
+    # Configurações do Codificador H.264 via CPU
+    "-c:v", "libx264",
+    "-preset", "ultrafast",                # Menor consumo possível de CPU por frame
+    "-crf", "23",                         # Fator de qualidade equilibrado
+    "-threads", "0",                       # Distribui a decodificação/codificação por todos os núcleos da CPU
+
+    VIDEO_FILE
+]
 
 print(f"Iniciando recepção RTP/H.264 usando SDP: {SDP}")
 print("Buffer UDP solicitado: 16777216 bytes")

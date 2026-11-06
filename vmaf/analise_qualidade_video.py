@@ -13,8 +13,10 @@ import matplotlib.pyplot as plt
 # 1. CONFIGURAÇÃO (edite aqui ou passe pela linha de comando)
 # ==========================================
 PASTA_PADRAO = "/home/cleb/ebpf/vmaf"
-VIDEO_REFERENCIA_PADRAO = "semsolucao.mkv"        # vídeo original (referência)
-VIDEO_AVALIADO_PADRAO = "comsolucao.mkv"  # vídeo a ser avaliado
+VIDEO_REFERENCIA_PADRAO = "bbb_sunflower_2160p_30fps_normal.mp4"        # vídeo original (referência)
+VIDEO_AVALIADO_PADRAO1 = "comsolucao.mkv"  # vídeo a ser avaliado
+VIDEO_AVALIADO_PADRAO1 = "comsolucao.mkv"
+
 
 parser = argparse.ArgumentParser(description="Calcula PSNR, SSIM e VMAF entre dois vídeos.")
 parser.add_argument("--referencia", default=VIDEO_REFERENCIA_PADRAO, help="Vídeo original (referência)")
